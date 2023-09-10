@@ -10,6 +10,7 @@ use pocketmine\player\Player;
 use AmitxD\BankNote\libs\davidglitch04\libEco\libEco;
 use AmitxD\BankNote\Manager\ConfigManager;
 use AmitxD\BankNote\Manager\ItemManager;
+use AmitxD\BankNote\Manager\TaxManager;
 
 class BankNoteCommand extends Command
 {
@@ -38,7 +39,7 @@ class BankNoteCommand extends Command
             $player->sendMessage($this->getUsage());
             return;
         }
-
+        
         $maxValue = 2000000000;
         if (!is_numeric($args[0]) || !ctype_digit($args[0]) || $args[0] > $maxValue) {
             $player->sendMessage($this->getConfig('messages.invalid-amount'));
@@ -47,12 +48,15 @@ class BankNoteCommand extends Command
 
         $amount = (int) $args[0];
         $count = isset($args[1]) ? (int) $args[1] : 1;
+        if(ConfigManager::getConfigNestedValue('tax.enabled') === true){
+            $money = TaxManager::applyRedemptionTax($amount) * $count;
+        }
         $money = $amount * $count;
 
         /** @phpstan-ignore-next-line */
-        libEco::reduceMoney($player, $money, function (bool $success) use ($player, $amount, $count,$money): void {
+        libEco::reduceMoney($player, $money, function (bool $success) use ($player, $amount, $count, $money): void {
             if ($success) {
-                $this->onSuccess($player, $amount, $count,$money);
+                $this->onSuccess($player, $amount, $count, $money);
             } else {
                 $this->onFailure($player);
             }
@@ -61,7 +65,8 @@ class BankNoteCommand extends Command
 
     private function onSuccess(Player $player,
         int $amount,
-        int $count,int $money): void
+        int $count,
+        int $money): void
     {
         $item = ItemManager::getNoteItem($player->getName(),
             $amount,
@@ -70,9 +75,9 @@ class BankNoteCommand extends Command
 
         if ($player->getInventory()->canAddItem($item)) {
             $player->getInventory()->addItem($item);
-            $message = $this->getConfig("messages.purchased");
-            $message = str_replace("{count}", (string)$count, $message);
-            $message = str_replace("{amount}", "$" . number_format($money, 2), $message);
+
+            $percentage = $this->getTaxPercent();
+            $message = $this->getPurchaseMessage($count, $money, $percentage);
             $player->sendMessage($message);
         } else {
             $invFullMessage = $this->getConfig("messages.inv-full");
@@ -83,6 +88,21 @@ class BankNoteCommand extends Command
     private function onFailure(Player $player): void
     {
         $player->sendMessage($this->getConfig("messages.no-money"));
+    }
+
+    private function getTaxPercent(): float {
+        $creationRate = TaxManager::getCreationRate();
+        $percentage = $creationRate * 100;
+        return $percentage;
+    }
+
+    private function getPurchaseMessage(int $count, int $money, float $percentage): string
+    {
+        $message = $this->getConfig("messages.purchased");
+        $message = str_replace("{count}", (string)$count, $message);
+        $message = str_replace("{amount}", "$" . number_format($money, 2), $message);
+        $message = str_replace("{percentage}", $percentage . "%", $message);
+        return $message;
     }
 
     private function getConfig(string $value): string

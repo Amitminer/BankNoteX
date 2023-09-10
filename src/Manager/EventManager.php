@@ -34,21 +34,32 @@ class EventManager implements Listener
 
     public function depositNoteMoney(Player $player, Item $item, int $amount): void {
         $count = $item->getCount();
+        
+        if(ConfigManager::getConfigNestedValue('tax.enabled') === true){
+            $money = TaxManager::applyRedemptionTax($amount) * $count;
+        }
         $money = $amount * $count;
-
+        
         /** @phpstan-ignore-next-line */
         libEco::addMoney($player, $money);
         $item->setCount($count - $count);
-
+        $percentage = $this->getTaxPercent();
         $player->getInventory()->setItemInHand($item);
-        $redeemMessage = $this->getRedeemMSG($player, $money);
+        $redeemMessage = $this->getRedeemMSG($player, $money,$percentage);
         $player->sendMessage($redeemMessage);
     }
 
-    private function getRedeemMSG($player, $money): string {
+    private function getRedeemMSG($player, $money, $percentage): string {
         $redeemMessage = ConfigManager::getConfigNestedValue('messages.redeem-success');
         $redeemMessage = str_replace("{money}", "$" . number_format($money, 2), $redeemMessage);
+        $message = str_replace("{percentage}", $percentage . "%", $redeemMessage);
         return $redeemMessage;
+    }
+    
+    private function getTaxPercent(): float{
+        $creationRate = TaxManager::getRedemptionRate();
+        $percentage = $creationRate * 100;
+        return $percentage;
     }
 
 }
