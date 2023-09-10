@@ -1,0 +1,29 @@
+{
+    "name": "amitxd/banknote",
+    "description": "convert your money into banknote (now you can finnally save your money:D",
+    "type": "pocketmine-plugin",
+    "scripts": {
+        "analyze": "vendor/bin/phpstan",
+        "build": "php -dphar.readonly=0 vendor/bin/pharynx -i=. -c -p=BankNoteX.phar"
+    },
+    "require": {
+        "pocketmine/pocketmine-mp": "^5",
+        "phpstan/phpstan-strict-rules": "^1.0",
+        "phpstan/extension-installer": "^1.0"
+    },
+    "require-dev": {
+        "sof3/pharynx": "^0.2",
+        "phpstan/phpstan": "^1.10"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-0": {
+            "AmitxD\\BankNote\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    }
+}

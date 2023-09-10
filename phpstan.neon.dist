@@ -1,0 +1,8 @@
+parameters:
+    level: 4
+    paths:
+        - src
+    scanDirectories:
+        - vendor
+    excludePaths:
+        - src/libs/davidglitch04/libEco/libEco.php

@@ -1,0 +1,13 @@
+---
+name: BankNote 
+version: 1.0.0
+main: AmitxD\BankNote\BankNote
+api: 5.0.0
+src-namespace-prefix: AmitxD\BankNote
+website: https://github.com/Amitminer/BankNote/
+
+permissions:
+  banknote.command.use:
+    description: "Allows the user to use banknote command"
+    default: op
+...

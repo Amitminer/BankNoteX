@@ -1,0 +1,30 @@
+## BankNote Config File
+
+# Banknote command
+command:
+  name: banknote
+  aliases:
+      - note
+      - withdraw 
+  usage: "/banknote {amount} {count}"
+  description: "Convert Money into Banknote for saving your money."
+
+# Messages
+messages:
+  prefix: "§6[BankNote]§f"
+  no-console: "Please use this Command in Game only."
+  invalid-amount: "§cInvalid amount! Please specify a valid amount."
+  no-money: "§cYou don't have enough money to create a Banknote."
+  purchased: "§aYou have successfully created {count} Banknotes of {amount}"
+  inv-full: "§cYour inventory is full. Please make space for the Banknote."
+  redeem-success: "§aYou have successfully redeemed a Banknote for {money}."
+
+# Banknote item settings
+banknote-item:
+  itemId: 'PAPER'  # Replace with the desired item ID (e.g., PAPER for paper)
+  itemName: "§aBankNote"
+  itemLore:
+    - "§r§4Right-click §cto deposit this note"
+    - "§aAmount: {Amount}"
+    - "§r§cCreated by: §4{CREATOR}"
+  itemTag: "BankNote"  # You can customize the NBT tag here if needed
