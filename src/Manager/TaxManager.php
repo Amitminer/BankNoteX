@@ -27,7 +27,7 @@ class TaxManager {
         return intval($amountAfterTax);
     }
 
-    public static function applyRedemptionTax(int $amount): float {
+    public static function applyRedemptionTax(int $amount): int {
         $taxRate = self::getRedemptionRate();
         $amountAfterTax = self::subtractPercentage($amount, $taxRate);
         return intval($amountAfterTax);
